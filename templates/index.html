@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>外食族「豆魚蛋肉」聰明選試算器</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 700px; margin: 30px auto; padding: 20px; line-height: 1.6; }
+        .card { border: 1px solid #ddd; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input[type="text"], select { width: 100%; padding: 8px; box-sizing: border-box; }
+        button { background-color: #28a745; color: white; padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; width: 100%; }
+        button:hover { background-color: #218838; }
+        .error { color: #721c24; background-color: #f8d7da; padding: 10px; border-radius: 4px; margin-bottom: 15px; }
+        .warning { color: #856404; background-color: #fff3cd; padding: 10px; border-radius: 4px; margin-bottom: 15px; }
+        .recommend { background-color: #e2e3e5; padding: 12px; border-radius: 4px; border-left: 5px solid #17a2b8; margin-top: 15px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        .tag-豆 { color: green; font-weight: bold; }
+        .tag-魚 { color: blue; font-weight: bold; }
+        .tag-蛋 { color: orange; font-weight: bold; }
+        .tag-肉 { color: red; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>🌿 外食族「豆魚蛋肉」聰明選試算器</h2>
+    <p><small>依據衛福部國健署指南：蛋白質選擇優先順序為 <b>豆類 > 魚類/海鮮 > 雞蛋 > 肉類</b></small></p>
+
+    {% if error_message %}
+        <div class="error">❌ {{ error_message }}</div>
+    {% endif %}
+
+    {% if warning_message %}
+        <div class="warning">⚠️ {{ warning_message }}</div>
+    {% endif %}
+
+    <form method="POST" action="/">
+        <div class="form-group">
+            <label for="budget">單餐預算上限 (元)：</label>
+            <input type="text" id="budget" name="budget" placeholder="例如：80">
+        </div>
+
+        <div class="form-group">
+            <label for="max_calories">單餐熱量上限 (大卡)：</label>
+            <input type="text" id="max_calories" name="max_calories" placeholder="例如：500">
+        </div>
+
+        <div class="form-group">
+            <label for="category">優先蛋白質來源（國健署推薦順序）：</label>
+            <select id="category" name="category">
+                <option value="ALL">不限（顯示所有符合條件者）</option>
+                <option value="豆">🌿 豆類（首選：植物性蛋白、高纖低飽和脂）</option>
+                <option value="魚">🐟 魚類/海鮮（次選：富含 Omega-3）</option>
+                <option value="蛋">🥚 雞蛋（優質完全蛋白質）</option>
+                <option value="肉">🥩 肉類（禽肉優先於紅肉）</option>
+            </select>
+        </div>
+
+        <button type="submit">🔍 開始計算與推薦</button>
+    </form>
+
+    {% if recommended_item %}
+        <div class="recommend">
+            🎲 <b>今日試算隨機推薦首選：</b><br>
+            <strong>{{ recommended_item.name }}</strong>（{{ recommended_item.category }}類）- 
+            價格：{{ recommended_item.price }}元 | 
+            熱量：{{ recommended_item.calories }}卡 | 
+            蛋白質：{{ recommended_item.protein }}g
+        </div>
+    {% endif %}
+
+    {% if results %}
+        <h3>📋 符合條件的餐點選擇 (共 {{ results|length }} 筆)：</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>品名</th>
+                    <th>類別</th>
+                    <th>價格 (元)</th>
+                    <th>熱量 (kcal)</th>
+                    <th>蛋白質 (g)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in results %}
+                <tr>
+                    <td>{{ item.name }}</td>
+                    <td><span class="tag-{{ item.category }}">{{ item.category }}類</span></td>
+                    <td>{{ item.price }}</td>
+                    <td>{{ item.calories }}</td>
+                    <td>{{ item.protein }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+</div>
+
+</body>
+</html>
